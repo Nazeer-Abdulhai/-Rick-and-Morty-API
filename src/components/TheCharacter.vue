@@ -1,33 +1,72 @@
 <template>
     <div class="main">
-        <form @submit.prevent="submitting">
-        <h2 class="title">Search for an character</h2>
-            <label for="">Give a Name</label>
-            <input type="text"  v-model="name">
+        <!-- All 3 forms -->
+        <div class="forms">
+            <!-- name and mood form  -->
+            <form @submit.prevent="nameMoodRender">
+                <h2 class="title">Find the character</h2>
+                    <label for="">By Name</label>
+                    <input type="text"  v-model="name">
 
-            <label for="">Or location</label>
-            <input type="text"  v-model="location">
+                    <!-- Search for Name or by a selected mood -->
+                    <label>choose alive or dead Characters</label>
+                    <select v-model="role">
+                        <option value="Alive">Alive</option>
+                        <option value="Dead">Dead</option>
+                    </select>
+                    <button class="btn">Show</button>
+            </form>
+            <!-- Episode form -->
+            <form @submit.prevent="callEpisode">
+                <h2 class="title">Find the character</h2>
+                    <label for="">By episode</label>
+                    <input type="text"  v-model="episode">
+                    <button class="btn show-margin-top">Show</button>
+            </form>
+            <!-- location form -->
+            <form action="" @submit.prevent="callLocation">
+                <h2 class="title">Find the character</h2>
+                <label for="">By Location</label>
+                <input type="text"  v-model="location">
+                <button class="btn show-margin-top">Show</button>
+            </form>
+        </div>
 
-            <label for="">Or type</label>
-            <input type="text"  v-model="type">
 
-            <label>choose alive or dead Characters</label>
-            <select v-model="role">
-                <option value="Alive">Alive</option>
-                <option value="Dead">Dead</option>
-            </select>
-            <button class="btn">Show me the Characters</button>
-        </form>
-            <div class="container">
-                <div class="card list" style="width: 18rem;" v-for="item in Thelist" :key="item.id" >
-                    <h2 class="card-title">{{ item.name}}</h2>
-                    <img :src="item.image" class="card-img-top" alt="...">
-                    <div class="card-body">
-                            <p class="card-text">Gender: {{item.gender}}</p>
-                        <p class="card-text">Specie: {{item.species}}</p>
-                    </div>
+        <!-- Displaying the characters -->
+
+        <div class="container">
+
+
+                <!-- NameMood Display -->
+            <div class="card list" style="width: 18rem;" v-for="item in TheNameMoodList" :key="item.id" >
+                <h2 class="card-title">{{ item.name}}</h2>
+                <img :src="item.image" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <p class="card-text">Gender: {{item.gender}}</p>
+                    <p class="card-text">Specie: {{item.species}}</p>
                 </div>
             </div>
+
+            <!-- Episode display -->
+            <div class="card list" style="width: 18rem;" v-for="item in episodeList" :key="item.id" >
+                <h2 class="card-title">{{ item.name}}</h2>
+                <img :src="item.image" class="card-img-top" alt="...">
+
+                <div class="card-body" v-html="characterEpisode(item.characters)">
+                </div>
+            </div>
+
+            <!-- Search By location -->
+                <div class="card list" style="width: 18rem;" v-for="item in LocationList" :key="item.id" >
+                    <h2 class="card-title">{{ item.name}}</h2>
+                    <img :src="item.image" class="card-img-top" alt="...">
+
+                <div class="card-body" v-html="characterLocation(item.location)">
+                </div>
+            </div>
+            
+        </div>
     </div>
 </template>
 
@@ -40,16 +79,20 @@ export default {
 
     data(){
         return {
-            Thelist: null,
+            TheNameMoodList: null,
+            episodeList: null,
+            LocationList: null,
              name: '',
              location: '',
              type: '',
              role: '',
+             episode: ''
+
         };
     },
 
     methods: {
-        submitting(){
+        nameMoodRender(){
         this.apiCall();
         },
 
@@ -65,9 +108,70 @@ export default {
             },
         }).then(res => 
         {
-            this.Thelist = res.data.results
+            this.TheNameMoodList = res.data.results
         }).catch('No result')
         },
+
+        callEpisode(){
+            axios({
+            method: 'get',
+            url: 'https://rickandmortyapi.com/api/episode',
+            params: {
+            name: this.episode,
+            },
+        }).then(res => 
+        {
+            this.episodeList = res.data.results
+        }).catch('No Episode has been found')
+        },
+
+        characterEpisode(list){
+            let result = '';
+            list.forEach(char => {
+                 axios({
+            method: 'get',
+            url: char,
+            }).then(res =>
+            
+            
+            {
+                result= "<div>"+res.data.name+"</div>";
+            }).catch('No result')
+            })
+            return result;
+        },
+
+        callLocation(){
+            axios({
+            method: 'get',
+            url: 'https://rickandmortyapi.com/api/location',
+            params: {
+            name: this.location,
+            },
+        }).then(res => 
+        {
+            this.LocationList = res.data.results
+        }).catch('No Location has been found')
+        },
+
+
+        characterLocation(x){
+            let result = '';
+            x.forEach(loc => {
+            axios({
+            method: 'get',
+            url: loc,
+            }).then(res =>
+            {
+                result = "<div>"+res.data.name+"</div>";
+            }).catch('No result')
+            })
+            return result;
+        },
+
+
+
+        
     }
 }
 </script>
@@ -76,6 +180,10 @@ export default {
 <style scoped>
 .main{
     margin-top: 15rem;
+}
+
+.forms{
+    display: flex;
 }
 .container{
     justify-content: space-between;
@@ -92,11 +200,11 @@ export default {
 }
 
 form {
-    max-width: 700px;
+    max-width: 400px;
     margin: 30px auto;
     background: white;
     text-align: center;
-    padding: 40px;
+    padding: 23px;
     border-radius: 10px;
     box-shadow: rgba(255, 255, 255, 0.2) 0px 7px 29px 0px;
     
@@ -130,5 +238,9 @@ button{
 
 button:hover{
     transform: translateY(-3px);
+}
+
+.show-margin-top{
+    margin-top: 110px;
 }
 </style>
