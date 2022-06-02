@@ -2,7 +2,7 @@
   <the-header>{{ msg }}</the-header>
   <the-character/> 
   <the-footer>{{ footer }}</the-footer>
-
+  <router-view/>
 </template>
 
 <script>

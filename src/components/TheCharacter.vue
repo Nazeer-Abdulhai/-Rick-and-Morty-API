@@ -2,14 +2,14 @@
     <div class="main">
         <form @submit.prevent="submitting">
         <h2 class="title">Search for an character</h2>
-            <label for="">Give dimension</label>
-            <input type="text"  v-model="dimension">
+            <label for="">Give a Name</label>
+            <input type="text"  v-model="name">
 
             <label for="">Or location</label>
             <input type="text"  v-model="location">
 
-            <label for="">Or episode</label>
-            <input type="text"  v-model="episode">
+            <label for="">Or type</label>
+            <input type="text"  v-model="type">
 
             <label>choose alive or dead Characters</label>
             <select v-model="role">
@@ -25,8 +25,6 @@
                     <div class="card-body">
                             <p class="card-text">Gender: {{item.gender}}</p>
                         <p class="card-text">Specie: {{item.species}}</p>
-                        <!-- <p class="card-text">{{ item.episode[0]}}</p> -->
-                        <!-- <p class="card-text">{{ item.type}}</p> -->
                     </div>
                 </div>
             </div>
@@ -43,16 +41,12 @@ export default {
     data(){
         return {
             Thelist: null,
-            dimension: '',
+             name: '',
              location: '',
-             episode: '',
+             type: '',
              role: '',
         };
     },
-
-    // created: function() {
-    //     this.apiCall();
-    // },
 
     methods: {
         submitting(){
@@ -60,17 +54,13 @@ export default {
         },
 
         apiCall(){
-        // axios.get("https://rickandmortyapi.com/api/character?status="+ this.dimension)
-        // .then(res => {this.Thelist = res.data.results;
-        // console.log(res);
-        // }).catch ('no result has been found')
         axios({
             method: 'get',
             url: 'https://rickandmortyapi.com/api/character',
             params: {
-            //  status: this.dimension,
-            //  status: this.location,
-            //  status: this.episode,
+             name: this.name,
+             location: this.location,
+             episode: this.episode,
              status: this.role
             },
         }).then(res => 
